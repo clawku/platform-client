@@ -279,22 +279,18 @@ if (autoApproveStored === null) {
 }
 
 // Production vs Development API configuration
-// IMPORTANT: These constants must be defined BEFORE the state object
-const IS_PRODUCTION = !window.location.hostname.includes('localhost') &&
-                       !window.location.hostname.includes('127.0.0.1') &&
-                       !window.location.protocol.includes('tauri');
-
-// In Tauri, check if we're in a release build
-const IS_TAURI_RELEASE = window.__TAURI__ && !window.__TAURI_DEBUG__;
-
 const PROD_API_BASE = 'https://api.b.clawku.id';
 const PROD_WS_BASE = 'wss://api.b.clawku.id';
 const DEV_API_BASES = ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
-const WEB_BASE_URL = IS_TAURI_RELEASE ? 'https://b.clawku.id' : 'http://localhost';
-const API_BASE_CANDIDATES = IS_TAURI_RELEASE
-  ? [PROD_API_BASE, ...DEV_API_BASES]
-  : [...DEV_API_BASES, PROD_API_BASE];
+// Set by detectBuildMode() in init() - defaults to release (production) for safety
+let IS_DEBUG_BUILD = false;
+const WEB_BASE_URL = 'http://localhost';
+
+// Returns API candidates based on build mode - dev tries localhost first, release goes straight to prod
+function getApiCandidates() {
+  return IS_DEBUG_BUILD ? [...DEV_API_BASES, PROD_API_BASE] : [PROD_API_BASE];
+}
 
 const state = {
   deviceToken: '',
@@ -306,8 +302,8 @@ const state = {
   pairingCode: '',
   client: null,
   user: null,
-  apiBaseUrl: IS_TAURI_RELEASE ? PROD_API_BASE : 'http://localhost:3000',
-  wsUrl: IS_TAURI_RELEASE ? `${PROD_WS_BASE}/devices/ws` : 'ws://localhost:3000/devices/ws',
+  apiBaseUrl: PROD_API_BASE, // Will be set by resolveApiBaseUrl() based on detected build mode
+  wsUrl: `${PROD_WS_BASE}/devices/ws`, // Will be set by resolveApiBaseUrl()
   apiReady: false,
   // Settings
   autoApprove: storage.get('clawku.autoApprove', 'false') === 'true',
@@ -692,7 +688,8 @@ async function probeApiBase(apiBaseUrl) {
 }
 
 async function resolveApiBaseUrl() {
-  for (const candidate of API_BASE_CANDIDATES) {
+  const candidates = getApiCandidates();
+  for (const candidate of candidates) {
     const ok = await probeApiBase(candidate);
     if (ok) {
       const base = normalizeBaseUrl(candidate);
@@ -705,7 +702,7 @@ async function resolveApiBaseUrl() {
     }
     logLine(`Probe failed: ${normalizeBaseUrl(candidate)}/health`);
   }
-  logLine(`API base: unreachable (${API_BASE_CANDIDATES.join(', ')})`);
+  logLine(`API base: unreachable (${candidates.join(', ')})`);
   setLoginStatus('Cannot reach API. Check your connection.');
   state.apiReady = false;
   return false;
@@ -1263,16 +1260,21 @@ function init() {
   }
   if (els.loginButton) {
     els.loginButton.addEventListener('click', async () => {
+      console.log('[LOGIN] Button clicked');
+      logLine('Login button clicked');
+      console.log('[LOGIN] state.apiReady:', state.apiReady);
       if (!state.apiReady) {
         setLoginStatus('API not reachable. Start the API on localhost:3000.');
         return;
       }
       const email = els.loginEmail?.value?.trim() || '';
       const password = els.loginPassword?.value || '';
+      console.log('[LOGIN] Email:', email, 'Password length:', password.length);
       if (!email || !password) {
         setLoginStatus('Enter email and password.');
         return;
       }
+      logLine(`Login attempt: ${email}`);
       setLoginStatus('Signing in...');
       try {
         const res = await apiRequest('/auth/login', 'POST', { email, password });
@@ -1281,12 +1283,15 @@ function init() {
       } catch (err) {
         const raw = err instanceof Error ? err.message : 'Login failed';
         let msg = raw;
-        if (raw && raw.trim().startsWith('{')) {
+        // Handle "HTTP 401: {...json...}" format from native invoke
+        const jsonMatch = raw.match(/HTTP \d+:\s*(\{.+\})/);
+        const jsonStr = jsonMatch ? jsonMatch[1] : (raw.trim().startsWith('{') ? raw : null);
+        if (jsonStr) {
           try {
-            const parsed = JSON.parse(raw);
-            msg = parsed?.message || parsed?.error || raw;
+            const parsed = JSON.parse(jsonStr);
+            msg = parsed?.message || parsed?.error || 'Login failed';
           } catch {
-            msg = raw;
+            msg = 'Login failed';
           }
         }
         setLoginStatus(msg);
@@ -1368,6 +1373,17 @@ function init() {
   renderJobs();
 
   (async () => {
+    // Detect build mode from Rust (cfg!(debug_assertions))
+    const invoke = window.__TAURI__?.core?.invoke || window.__TAURI__?.invoke;
+    if (invoke) {
+      try {
+        IS_DEBUG_BUILD = await invoke('is_debug_build', {});
+      } catch (err) {
+        logLine(`Build mode detection failed: ${err}`);
+        IS_DEBUG_BUILD = false; // Default to production for safety
+      }
+    }
+    logLine(`Build mode: ${IS_DEBUG_BUILD ? 'DEBUG' : 'RELEASE'}`);
     const ready = await resolveApiBaseUrl();
     if (!ready) {
       setUser(null);
@@ -1379,7 +1395,7 @@ function init() {
     } catch {
       setUser(null);
     }
-    const invoke = window.__TAURI__?.core?.invoke || window.__TAURI__?.invoke;
+    // Reuse invoke from above for device token loading
     if (invoke) {
       try {
         const token = await invoke('load_device_token', {});

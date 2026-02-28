@@ -154,15 +154,30 @@ fn clear_device_token() -> Result<(), String> {
 
 #[tauri::command]
 async fn http_probe(url: String) -> Result<bool, String> {
+    println!("[http_probe] Probing: {}", url);
     let client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(5))
         .build()
         .map_err(|e| e.to_string())?;
 
     match client.get(&url).send().await {
-        Ok(resp) => Ok(resp.status().is_success()),
-        Err(e) => Err(e.to_string()),
+        Ok(resp) => {
+            let ok = resp.status().is_success();
+            println!("[http_probe] {} -> {}", url, if ok { "OK" } else { "FAIL" });
+            Ok(ok)
+        },
+        Err(e) => {
+            println!("[http_probe] {} -> Error: {}", url, e);
+            Err(e.to_string())
+        },
     }
+}
+
+#[tauri::command]
+fn is_debug_build() -> bool {
+    let is_debug = cfg!(debug_assertions);
+    println!("[is_debug_build] Called, returning: {}", is_debug);
+    is_debug
 }
 
 #[tauri::command]
@@ -185,6 +200,9 @@ async fn http_get(url: String) -> Result<String, String> {
 
 #[tauri::command]
 async fn http_post(url: String, body: String) -> Result<String, String> {
+    println!("[http_post] URL: {}", url);
+    println!("[http_post] Body: {}", body);
+
     let client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(30))
         .build()
@@ -200,6 +218,8 @@ async fn http_post(url: String, body: String) -> Result<String, String> {
 
     let status = resp.status();
     let text = resp.text().await.map_err(|e| e.to_string())?;
+
+    println!("[http_post] Status: {} Response: {}", status.as_u16(), &text[..text.len().min(200)]);
 
     if status.is_success() {
         Ok(text)
@@ -750,6 +770,7 @@ fn main() {
             http_probe,
             http_get,
             http_post,
+            is_debug_build,
             enable_autostart,
             disable_autostart,
             get_executable_path,
