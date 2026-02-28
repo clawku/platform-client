@@ -1,0 +1,31 @@
+[package]
+name = "clawku-client"
+version = "0.1.3"
+edition = "2021"
+
+[dependencies]
+tauri = { version = "2.0.0", features = ["tray-icon"] }
+tauri-plugin-updater = "2"
+serde = { version = "1.0", features = ["derive"] }
+keyring = "2.3.2"
+dirs = "6.0.0"
+base64 = "0.22.1"
+ed25519-dalek = { version = "2.2.0", features = ["pkcs8", "pem"] }
+rand_core = "0.6.4"
+sha2 = "0.10.8"
+rcgen = "0.12.1"
+shell-words = "1.1.0"
+hex = "0.4.3"
+serde_json = "1.0.116"
+tokio = { version = "1.36.0", features = ["rt-multi-thread", "macros", "sync", "time"] }
+tokio-tungstenite = { version = "0.23.1", features = ["rustls-tls-webpki-roots"] }
+url = "2.5.0"
+futures-util = "0.3.30"
+rustls = "0.23.36"
+rustls-pemfile = "2.2.0"
+pkcs8 = "0.10.2"
+tauri-plugin-http = "2.5.7"
+reqwest = "0.13.2"
+
+[build-dependencies]
+tauri-build = { version = "2.0.0", features = [] }

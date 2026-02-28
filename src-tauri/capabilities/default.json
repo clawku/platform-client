@@ -1,0 +1,16 @@
+{
+  "identifier": "main-capabilities",
+  "description": "Allow core IPC, events, tray, menu, updater, and HTTP for the main window.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "core:event:allow-emit",
+    "core:tray:default",
+    "core:menu:default",
+    "updater:default",
+    "core:app:allow-version",
+    "http:default"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "clawku-client",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "echo 'Initialize Tauri template when network is available'",
+    "build": "echo 'Initialize Tauri template when network is available'"
+  }
+}

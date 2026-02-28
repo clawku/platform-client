@@ -1,0 +1,1176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clawku Client</title>
+    <style>
+      /* Import Google Fonts - Crab & Cloud Design System */
+      @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+      /* CSS Variables - Crab & Cloud Design System */
+      :root {
+        /* Primary Brand Colors - Coral Crab */
+        --color-primary: #f45d5d;
+        --color-primary-hover: #e84a4a;
+        --color-primary-light: #ff8a8a;
+        --color-primary-dark: #d44040;
+        --color-primary-muted: rgba(244, 93, 93, 0.12);
+
+        /* Secondary Brand Colors - Teal Mint */
+        --color-secondary: #00d4aa;
+        --color-secondary-hover: #00c49b;
+        --color-secondary-light: #5eecd5;
+        --color-secondary-dark: #00a888;
+        --color-secondary-muted: rgba(0, 212, 170, 0.12);
+
+        /* Navy (Dark/Text) */
+        --color-navy: #1e2a4a;
+        --color-navy-light: #2d3f5f;
+        --color-navy-lighter: #3d5276;
+
+        /* Cloud (Backgrounds) */
+        --color-cloud: #ffffff;
+        --color-cloud-soft: #f8fafb;
+        --color-cloud-mist: #f0f4f7;
+        --color-cloud-fog: #e4eaf0;
+
+        /* Supporting Colors */
+        --color-sky: #4da6ff;
+        --color-lavender: #a78bfa;
+        --color-peach: #ffb088;
+        --color-lemon: #ffd93d;
+
+        /* Semantic Colors */
+        --color-success: #10b981;
+        --color-success-light: rgba(16, 185, 129, 0.12);
+        --color-error: #ef4444;
+        --color-error-light: rgba(239, 68, 68, 0.12);
+        --color-warning: #f59e0b;
+        --color-warning-light: rgba(245, 158, 11, 0.12);
+        --color-info: #3b82f6;
+        --color-info-light: rgba(59, 130, 246, 0.12);
+
+        /* Mapped/Alias Variables */
+        --color-bg: var(--color-cloud-soft);
+        --color-bg-elevated: var(--color-cloud);
+        --color-bg-soft: var(--color-cloud-mist);
+        --color-text: var(--color-navy);
+        --color-text-secondary: var(--color-navy-light);
+        --color-text-muted: #5a6b7e;
+        --color-border: rgba(30, 42, 74, 0.08);
+        --color-border-hover: rgba(30, 42, 74, 0.15);
+
+        /* Brand Gradients */
+        --gradient-brand: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+        --gradient-claw: linear-gradient(180deg, var(--color-secondary) 0%, var(--color-secondary-dark) 100%);
+        --gradient-crab: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+
+        /* Typography */
+        --font-display: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+
+        /* Spacing */
+        --space-1: 0.25rem;
+        --space-2: 0.5rem;
+        --space-3: 0.75rem;
+        --space-4: 1rem;
+        --space-5: 1.25rem;
+        --space-6: 1.5rem;
+        --space-8: 2rem;
+
+        /* Border Radius */
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --radius-xl: 20px;
+        --radius-full: 9999px;
+
+        /* Shadows */
+        --shadow-sm: 0 2px 8px rgba(30, 42, 74, 0.06);
+        --shadow-md: 0 4px 16px rgba(30, 42, 74, 0.08);
+        --shadow-lg: 0 8px 32px rgba(30, 42, 74, 0.1);
+        --shadow-xl: 0 16px 48px rgba(30, 42, 74, 0.12);
+        --shadow-primary: 0 4px 20px rgba(244, 93, 93, 0.25);
+        --shadow-secondary: 0 4px 20px rgba(0, 212, 170, 0.25);
+
+        color-scheme: light;
+        font-family: var(--font-body);
+        line-height: 1.5;
+        font-weight: 400;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: var(--color-text);
+        background-color: var(--color-bg);
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background: var(--color-cloud-soft);
+      }
+
+      /* Auth mode - prevent scrolling when login card is shown */
+      body.auth-mode {
+        overflow: hidden;
+        height: 100vh;
+      }
+
+      body.auth-mode #app {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: calc(100vh - 2rem);
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-display);
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--color-navy);
+      }
+
+      /* Header */
+      .header {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--color-cloud-fog);
+        padding: 0 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header-inner {
+        max-width: 880px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+      }
+
+      .header-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .header-logo-img {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+      }
+
+      .auth-logo-img {
+        width: 72px;
+        height: 72px;
+        object-fit: contain;
+      }
+
+      .header-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--color-navy);
+        font-family: var(--font-display);
+      }
+
+      .header-nav {
+        display: flex;
+        gap: 0.25rem;
+      }
+
+      .nav-tab {
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        border: none;
+        background: transparent;
+        color: var(--color-text-muted);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: var(--font-body);
+      }
+
+      .nav-tab:hover {
+        background: var(--color-cloud-mist);
+        color: var(--color-navy);
+      }
+
+      .nav-tab.active {
+        background: var(--color-primary-muted);
+        color: var(--color-primary);
+      }
+
+      .header-status {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      /* Main container */
+      #app {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 2rem 2rem 3rem;
+      }
+
+      /* Cards */
+      .card {
+        background: var(--color-cloud);
+        border: 1px solid var(--color-cloud-fog);
+        border-radius: var(--radius-xl);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s ease;
+      }
+
+      .card:hover {
+        box-shadow: var(--shadow-md);
+      }
+
+      .card + .card {
+        margin-top: 1rem;
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+
+      .card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--color-navy);
+        margin: 0;
+        font-family: var(--font-display);
+      }
+
+      .card-subtitle {
+        font-size: 0.875rem;
+        color: var(--color-text-muted);
+        margin-top: 0.25rem;
+      }
+
+      /* Status pill */
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: var(--radius-full);
+        font-size: 0.8125rem;
+        font-weight: 600;
+        background: var(--color-cloud-mist);
+        color: var(--color-text-muted);
+        border: 1px solid var(--color-cloud-fog);
+      }
+
+      .status-pill::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .status-pill.connected {
+        background: var(--color-success-light);
+        color: var(--color-success);
+        border-color: rgba(16, 185, 129, 0.3);
+      }
+
+      .status-pill.error {
+        background: var(--color-error-light);
+        color: var(--color-error);
+        border-color: rgba(239, 68, 68, 0.3);
+      }
+
+      /* Form elements */
+      label {
+        display: block;
+        font-size: 0.8125rem;
+        color: var(--color-text-muted);
+        margin-bottom: 0.375rem;
+        font-weight: 600;
+      }
+
+      input, textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-lg);
+        border: 2px solid var(--color-cloud-fog);
+        background: var(--color-cloud);
+        font-size: 0.9375rem;
+        color: var(--color-navy);
+        font-family: var(--font-body);
+        transition: all 0.2s ease;
+      }
+
+      input::placeholder, textarea::placeholder {
+        color: var(--color-text-muted);
+      }
+
+      input:focus, textarea:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        background: var(--color-cloud);
+        box-shadow: 0 0 0 4px var(--color-primary-muted);
+      }
+
+      input[readonly] {
+        background: var(--color-cloud-mist);
+        color: var(--color-text-muted);
+      }
+
+      textarea {
+        min-height: 100px;
+        resize: vertical;
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+      }
+
+      /* Buttons */
+      button {
+        padding: 0.75rem 1.25rem;
+        border-radius: var(--radius-lg);
+        border: none;
+        background: var(--color-primary);
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        font-family: var(--font-display);
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm), var(--shadow-primary);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      button:hover:not(:disabled) {
+        background: var(--color-primary-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md), var(--shadow-primary);
+      }
+
+      button:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      button.secondary {
+        background: var(--color-secondary);
+        color: #fff;
+        box-shadow: var(--shadow-sm), var(--shadow-secondary);
+      }
+
+      button.secondary:hover:not(:disabled) {
+        background: var(--color-secondary-hover);
+        box-shadow: var(--shadow-md), var(--shadow-secondary);
+      }
+
+      button.outline {
+        background: transparent;
+        color: var(--color-primary);
+        border: 2px solid var(--color-primary);
+        box-shadow: none;
+      }
+
+      button.outline:hover:not(:disabled) {
+        background: var(--color-primary);
+        color: #fff;
+      }
+
+      button.ghost {
+        background: transparent;
+        color: var(--color-navy);
+        box-shadow: none;
+      }
+
+      button.ghost:hover:not(:disabled) {
+        background: var(--color-primary-muted);
+        color: var(--color-primary);
+      }
+
+      button.soft {
+        background: var(--color-cloud-mist);
+        border: 2px solid var(--color-cloud-fog);
+        color: var(--color-navy);
+        box-shadow: none;
+      }
+
+      button.soft:hover:not(:disabled) {
+        background: var(--color-cloud-fog);
+        border-color: var(--color-border-hover);
+      }
+
+      button.success {
+        background: var(--color-success);
+        box-shadow: var(--shadow-sm), 0 4px 20px rgba(16, 185, 129, 0.25);
+      }
+
+      button.success:hover:not(:disabled) {
+        background: #0da372;
+      }
+
+      button.danger {
+        background: var(--color-error-light);
+        color: var(--color-error);
+        box-shadow: none;
+      }
+
+      button.danger:hover:not(:disabled) {
+        background: var(--color-error);
+        color: #fff;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      button.sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.8125rem;
+      }
+
+      /* Toggle Switch */
+      .toggle-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        background: var(--color-cloud-mist);
+        border-radius: var(--radius-lg);
+        margin-bottom: 0.75rem;
+        border: 1px solid var(--color-cloud-fog);
+      }
+
+      .toggle-label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+      }
+
+      .toggle-title {
+        font-weight: 600;
+        color: var(--color-navy);
+        font-size: 0.9375rem;
+        font-family: var(--font-display);
+      }
+
+      .toggle-desc {
+        font-size: 0.8125rem;
+        color: var(--color-text-muted);
+      }
+
+      .toggle {
+        position: relative;
+        width: 48px;
+        height: 28px;
+        background: var(--color-cloud-fog);
+        border-radius: 14px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        flex-shrink: 0;
+      }
+
+      .toggle::after {
+        content: '';
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 22px;
+        height: 22px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.2s ease;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .toggle.active {
+        background: var(--color-secondary);
+      }
+
+      .toggle.active::after {
+        transform: translateX(20px);
+      }
+
+      /* Row layouts */
+      .row {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .field {
+        margin-bottom: 1rem;
+      }
+
+      .field:last-child {
+        margin-bottom: 0;
+      }
+
+      /* Divider */
+      .divider {
+        margin: 1.25rem 0;
+        border: none;
+        border-top: 1px solid var(--color-cloud-fog);
+      }
+
+      /* User profile section */
+      .profile-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: linear-gradient(135deg, rgba(244, 93, 93, 0.06) 0%, rgba(0, 212, 170, 0.06) 100%);
+        border-radius: var(--radius-lg);
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--color-cloud-fog);
+      }
+
+      .profile-avatar {
+        width: 48px;
+        height: 48px;
+        background: var(--gradient-brand);
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: white;
+        font-size: 1.25rem;
+        text-transform: uppercase;
+        font-family: var(--font-display);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .profile-info {
+        flex: 1;
+      }
+
+      .profile-name {
+        font-weight: 600;
+        color: var(--color-navy);
+        font-size: 1rem;
+        font-family: var(--font-display);
+      }
+
+      .profile-email {
+        font-size: 0.875rem;
+        color: var(--color-text-muted);
+      }
+
+      /* Job cards */
+      .job-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .job-item {
+        border: 1px solid var(--color-cloud-fog);
+        border-radius: var(--radius-lg);
+        padding: 1rem;
+        background: var(--color-cloud);
+        transition: all 0.2s ease;
+      }
+
+      .job-item:hover {
+        background: var(--color-cloud-soft);
+        border-color: var(--color-border-hover);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .job-command {
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+        color: var(--color-navy);
+        background: var(--color-cloud-mist);
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--radius-md);
+        margin-bottom: 0.75rem;
+        word-break: break-all;
+      }
+
+      .job-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .job-info {
+        font-size: 0.8125rem;
+        color: var(--color-text-muted);
+      }
+
+      .job-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      /* Empty state */
+      .empty-state {
+        text-align: center;
+        padding: 2.5rem;
+        color: var(--color-text-muted);
+        background: var(--color-cloud-mist);
+        border-radius: var(--radius-lg);
+      }
+
+      .empty-state-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+        opacity: 0.5;
+      }
+
+      /* Pairing code display */
+      .pairing-display {
+        background: linear-gradient(135deg, rgba(244, 93, 93, 0.15) 0%, rgba(0, 212, 170, 0.15) 100%);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        text-align: center;
+        margin: 1rem 0;
+        border: 2px dashed var(--color-secondary);
+      }
+
+      .pairing-code {
+        font-family: var(--font-mono);
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        color: var(--color-navy);
+        background: var(--gradient-brand);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .pairing-hint {
+        font-size: 0.8125rem;
+        color: var(--color-text-muted);
+        margin-top: 0.5rem;
+      }
+
+      /* Page sections */
+      .page {
+        display: none;
+      }
+
+      .page.active {
+        display: block;
+      }
+
+      .section-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--color-navy);
+        margin: 0 0 1rem 0;
+        font-family: var(--font-display);
+      }
+
+      /* Auth card */
+      .auth-card {
+        max-width: 400px;
+        margin: 3rem auto;
+      }
+
+      .auth-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .auth-header h1 {
+        font-size: 1.5rem;
+        margin: 0 0 0.5rem 0;
+        color: var(--color-navy);
+        font-family: var(--font-display);
+      }
+
+      .auth-header p {
+        color: var(--color-text-muted);
+        margin: 0;
+      }
+
+      .auth-footer {
+        text-align: center;
+        margin-top: 1.25rem;
+        font-size: 0.875rem;
+        color: var(--color-text-muted);
+      }
+
+      .auth-footer a {
+        color: var(--color-primary);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .auth-footer a:hover {
+        text-decoration: underline;
+      }
+
+      /* Device info grid */
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+
+      .info-item {
+        padding: 1rem;
+        background: var(--color-cloud-mist);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--color-cloud-fog);
+      }
+
+      .info-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-text-muted);
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+      }
+
+      .info-value {
+        font-size: 0.9375rem;
+        color: var(--color-navy);
+        font-weight: 600;
+        word-break: break-all;
+        font-family: var(--font-display);
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--color-cloud-mist);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--color-cloud-fog);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-border-hover);
+      }
+
+      /* Selection */
+      ::selection {
+        background: rgba(244, 93, 93, 0.25);
+        color: var(--color-navy);
+      }
+
+      /* Muted text */
+      .muted {
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
+      }
+
+      /* Modal */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+
+      .modal-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(30, 42, 74, 0.5);
+        backdrop-filter: blur(4px);
+      }
+
+      .modal-content {
+        position: relative;
+        background: var(--color-cloud);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
+        max-width: 700px;
+        width: 100%;
+        max-height: 90vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--color-cloud-fog);
+      }
+
+      .modal-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--color-navy);
+        margin: 0;
+        font-family: var(--font-display);
+      }
+
+      .modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        flex: 1;
+      }
+
+      /* Responsive */
+      @media (max-width: 640px) {
+        .header {
+          padding: 0 1rem;
+        }
+
+        #app {
+          padding: 1.5rem 1rem 2rem;
+        }
+
+        .card {
+          padding: 1.25rem;
+        }
+
+        .profile-section {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .job-meta {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .job-actions {
+          width: 100%;
+        }
+
+        .job-actions button {
+          flex: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header" id="mainHeader" style="display: none;">
+      <div class="header-inner">
+        <div class="header-brand">
+          <img class="header-logo-img" src="data:image/png;base64,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" alt="Clawku" width="28" height="28" />
+          <span class="header-title">Clawku</span>
+        </div>
+        <nav class="header-nav">
+          <button class="nav-tab active" data-page="dashboard">Dashboard</button>
+          <button class="nav-tab" data-page="settings">Settings</button>
+        </nav>
+        <div class="header-status">
+          <span id="clientStatus" class="status-pill">Disconnected</span>
+        </div>
+      </div>
+    </header>
+
+    <div id="app">
+      <!-- Auth Card (shown when not logged in) -->
+      <div class="card auth-card" id="authCard">
+        <div class="auth-header">
+          <img class="auth-logo-img" src="data:image/png;base64,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" alt="Clawku" width="72" height="72" style="margin: 0 auto 1rem; display: block;" />
+          <h1>Welcome to Clawku</h1>
+          <p>Sign in to connect your device</p>
+        </div>
+
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <input id="loginEmail" type="email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" type="password" placeholder="Enter your password" autocomplete="current-password" />
+        </div>
+
+        <div id="loginStatus" class="muted" style="margin-bottom: 1rem; min-height: 1.25rem;"></div>
+
+        <button id="loginButton" style="width: 100%;">Sign In</button>
+
+        <div class="auth-footer">
+          Don't have an account? <a href="#" id="openRegister">Create one</a>
+        </div>
+
+        <details style="margin-top: 1.5rem;">
+          <summary class="muted" style="cursor: pointer;">Connection diagnostics</summary>
+          <textarea id="authLogOutput" readonly style="margin-top: 0.75rem; min-height: 80px;"></textarea>
+        </details>
+      </div>
+
+      <!-- Main App (shown after login) -->
+      <div id="appMain" style="display: none;">
+
+        <!-- Dashboard Page -->
+        <div class="page active" id="pageDashboard">
+          <!-- Device Status Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Device Connection</h3>
+                <p class="card-subtitle">Manage your device pairing and connection</p>
+              </div>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Device ID</div>
+                <div class="info-value" id="deviceIdDisplay">-</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Device Name</div>
+                <div class="info-value" id="deviceNameDisplay">-</div>
+              </div>
+            </div>
+
+            <!-- Paired State: Simple reconnect/re-pair view -->
+            <div id="pairedView" style="display: none;">
+              <hr class="divider" />
+              <div class="row">
+                <button id="connectClient" class="secondary">Reconnect</button>
+                <button id="showRepairBtn" class="ghost">Re-pair Device</button>
+              </div>
+            </div>
+
+            <!-- Unpaired State: Full pairing flow -->
+            <div id="unpairView">
+              <hr class="divider" />
+
+              <div class="field">
+                <label for="deviceName">Device Name</label>
+                <input id="deviceName" placeholder="e.g. MacBook Pro" />
+              </div>
+
+              <div id="pairingBox" style="display: none;">
+                <div class="pairing-display">
+                  <div id="pairingCode" class="pairing-code">------</div>
+                  <div class="pairing-hint">Enter this code in the web app to pair</div>
+                </div>
+                <p id="pairingStatus" class="muted" style="text-align: center;"></p>
+              </div>
+
+              <div class="field">
+                <label for="pairingCodeInput">Manual Pairing Code</label>
+                <input id="pairingCodeInput" placeholder="Enter code if you already have one" style="text-transform: uppercase; letter-spacing: 0.1em;" />
+              </div>
+
+              <div class="row" style="margin-top: 0.5rem;">
+                <button id="startPairing">Start Pairing</button>
+                <button id="finishPairing" class="secondary">Confirm Pairing</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Approval Queue Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Pending Approvals</h3>
+              <span id="jobCount" class="muted">0 pending</span>
+            </div>
+
+            <div id="jobs" class="job-list"></div>
+            <div id="jobsEmpty" class="empty-state">
+              <div class="empty-state-icon">&#10003;</div>
+              <div>No pending commands</div>
+              <div class="muted">Commands sent to your device will appear here</div>
+            </div>
+          </div>
+
+          <!-- Logs Card -->
+          <div class="card" id="logsCard">
+            <div class="card-header">
+              <h3 class="card-title">Activity Log</h3>
+              <button id="clearLogs" class="ghost sm">Clear</button>
+            </div>
+            <textarea id="logOutput" readonly placeholder="Activity will appear here..."></textarea>
+          </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div class="page" id="pageSettings">
+          <div class="card">
+            <h3 class="section-title">Account</h3>
+
+            <div class="profile-section">
+              <div class="profile-avatar" id="profileAvatar">?</div>
+              <div class="profile-info">
+                <div class="profile-name" id="profileName">-</div>
+                <div class="profile-email" id="profileEmail">-</div>
+              </div>
+              <button id="logoutButton" class="danger sm">Sign Out</button>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Device ID</div>
+                <div class="info-value" id="settingsDeviceId">-</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Connection Status</div>
+                <div class="info-value" id="settingsConnectionStatus">Disconnected</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="section-title">Command Execution</h3>
+
+            <div class="toggle-wrapper">
+              <div class="toggle-label">
+                <div class="toggle-title">Auto-approve all commands</div>
+                <div class="toggle-desc">Automatically execute incoming commands without manual approval</div>
+              </div>
+              <div id="toggleAutoApprove" class="toggle"></div>
+            </div>
+            <div class="row" style="margin-top: 0.75rem;">
+              <button id="exportPolicy" class="secondary">Export Policy</button>
+            </div>
+
+            <div class="toggle-wrapper">
+              <div class="toggle-label">
+                <div class="toggle-title">Show notifications</div>
+                <div class="toggle-desc">Display system notifications for incoming commands</div>
+              </div>
+              <div id="toggleNotifications" class="toggle active"></div>
+            </div>
+
+            <div class="toggle-wrapper">
+              <div class="toggle-label">
+                <div class="toggle-title">Debug mode</div>
+                <div class="toggle-desc">Show activity logs on the dashboard</div>
+              </div>
+              <div id="toggleDebug" class="toggle"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="section-title">Startup</h3>
+
+            <div class="row">
+              <button id="enableAutostart" class="secondary">Enable Autostart</button>
+              <button id="disableAutostart" class="ghost">Disable Autostart</button>
+            </div>
+            <p class="muted" style="margin-top: 0.75rem;">Launch Clawku automatically when you log in to your computer.</p>
+          </div>
+
+          <div class="card">
+            <h3 class="section-title">Updates</h3>
+
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Current Version</div>
+                <div class="info-value" id="currentVersion">0.1.0</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Update Status</div>
+                <div class="info-value" id="updateStatus">Up to date</div>
+              </div>
+            </div>
+
+            <div class="row" style="margin-top: 1rem;">
+              <button id="checkUpdates" class="secondary">Check for Updates</button>
+              <button id="installUpdate" class="success" style="display: none;">Install Update</button>
+            </div>
+            <p class="muted" style="margin-top: 0.75rem;" id="updateMessage">Last checked: Never</p>
+
+            <div id="updateProgress" style="display: none; margin-top: 1rem;">
+              <div class="info-label">Download Progress</div>
+              <div style="background: var(--color-cloud-fog); border-radius: var(--radius-full); height: 8px; margin-top: 0.5rem; overflow: hidden;">
+                <div id="updateProgressBar" style="background: var(--gradient-brand); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+              </div>
+              <p class="muted" style="margin-top: 0.5rem;" id="updateProgressText">Downloading...</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="section-title">Advanced</h3>
+
+            <div class="row">
+              <button id="clearPairing" class="danger">Clear Pairing Data</button>
+            </div>
+            <p class="muted" style="margin-top: 0.75rem;">Remove all pairing data and disconnect from the server. You'll need to pair again.</p>
+          </div>
+
+          <div class="card">
+            <h3 class="section-title">About</h3>
+
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Application</div>
+                <div class="info-value">Clawku Desktop Client</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Version</div>
+                <div class="info-value" id="aboutVersion">0.1.0</div>
+              </div>
+            </div>
+
+            <hr class="divider" />
+
+            <div style="margin-bottom: 1rem;">
+              <div class="info-label" style="margin-bottom: 0.5rem;">License</div>
+              <p style="margin: 0; font-size: 0.9375rem; color: var(--color-navy);">
+                Apache License 2.0
+              </p>
+              <p class="muted" style="margin: 0.5rem 0 0 0;">
+                Copyright 2024 Clawku. Licensed under the Apache License, Version 2.0.
+              </p>
+            </div>
+
+            <div class="row">
+              <button id="viewLicense" class="soft sm">View Full License</button>
+              <button id="viewSourceCode" class="soft sm">Source Code</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- License Modal -->
+    <div id="licenseModal" class="modal" style="display: none;">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Apache License 2.0</h3>
+          <button id="closeLicenseModal" class="ghost sm">&times;</button>
+        </div>
+        <div class="modal-body">
+          <pre id="licenseText" style="white-space: pre-wrap; font-size: 0.8125rem; line-height: 1.6; max-height: 60vh; overflow-y: auto; background: var(--color-cloud-mist); padding: 1rem; border-radius: var(--radius-md);">Loading...</pre>
+        </div>
+      </div>
+    </div>
+
+    <script src="./main.js"></script>
+  </body>
+</html>
