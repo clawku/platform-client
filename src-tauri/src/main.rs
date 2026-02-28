@@ -641,6 +641,11 @@ fn run_command(command: String, cwd: Option<String>) -> Result<CommandResult, St
 }
 
 fn main() {
+    // Install the ring crypto provider for rustls
+    rustls::crypto::ring::default_provider()
+        .install_default()
+        .expect("Failed to install rustls crypto provider");
+
     let app_state = AppState {
         ws_tx: Mutex::new(None),
         ws_abort: Mutex::new(None),
