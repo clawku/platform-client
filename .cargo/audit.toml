@@ -1,0 +1,8 @@
+# Cargo audit configuration
+# See: https://rustsec.org/
+
+[advisories]
+# Ignore glib unsoundness advisory - waiting for Tauri v3 gtk4-rs migration
+# See: https://github.com/tauri-apps/tauri/issues/12562
+# Risk: Low - crash only (not RCE), Linux-only, specific code path unlikely to be triggered
+ignore = ["RUSTSEC-2024-0429"]
